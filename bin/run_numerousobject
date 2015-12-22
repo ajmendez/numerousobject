@@ -1,0 +1,49 @@
+#!/bin/bash
+
+PIDFILE=$HOME/tmp/numerousobject.pid
+LOGFILE=$HOME/tmp/numerousobject.log
+OLDFILE=$HOME/tmp/numerousobject.old
+
+source $HOME/.bashrc
+
+export PATH=$HOME/dev/numerousobject:$PATH
+# export PYTHONPATH="$HOME/dev/scintillate:${PYTHONPATH}"
+# export PYTHONPATH="$HOME/dev/pymendez:${PYTHONPATH}"
+# export PYTHONPATH="$HOME/dev/pymendez_basic:${PYTHONPATH}"
+# export PYTHONPATH="$HOME/dev/pysurvey:${PYTHONPATH}"
+# export PYTHONPATH="$HOME/dev/timerasp:${PYTHONPATH}"
+# export PYTHONPATH="$HOME/dev/picamera:${PYTHONPATH}"
+
+START=0
+if [ -e "$PIDFILE" ]; then
+    PID="$(cat $PIDFILE)"
+    if ! ps -p $PID > /dev/null ; then
+        # last process is not around
+        echo "Clean up from last process [$PID]"
+        rm $PIDFILE
+        START=1
+    else
+        echo -n '.'
+    fi
+else
+    START=1
+fi
+
+if [ "$(pidof numerousobject)" ]; then
+    START=0
+fi
+
+if [ $START -eq 1 ]; then
+    if [ -e "$LOGFILE" ]; then 
+      mv $LOGFILE $OLDFILE
+    fi
+    
+    echo "-------------"
+    echo " $(date) : $(date +%s)"
+    echo "> $(date) : $(date +%s)" > $LOGFILE
+    /usr/bin/python -u $HOME/dev/numerousobject/bin/numerousobject.py >> $LOGFILE 2>&1 &
+    echo $! > $PIDFILE
+    echo "RUNNING!"
+fi
+
+# popd > /dev/null 2>&1
