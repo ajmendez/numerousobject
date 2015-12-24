@@ -1,8 +1,64 @@
 #!/usr/bin/env python
+'''
+
+pip install splinter[zope.testbrowser]
+pip install splinter[django]
+
+'''
+
+
+
 
 import os
-import time
 import splinter
+USERNAME, PASSWORD = open(os.path.expanduser('~/.limited/manything')).read().strip().split(' ')
+browser_name = 'phantomjs'
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:37.0) Gecko/20100101 Firefox/37.0"
+b = splinter.Browser(browser_name, user_agent=user_agent)
+# b = splinter.Browser('zope.testbrowser', ignore_robots=True, user_agent=user_agent)
+b.visit('https://manything.com/sign-in.html')
+b.find_by_id('username').first.fill(USERNAME)
+b.find_by_id('password').first.fill(PASSWORD)
+b.find_by_id('signin-btn').first.click()
+
+
+
+
+import os
+import splinter
+USERNAME, PASSWORD = open(os.path.expanduser('~/.limited/numerousobject')).read().strip().split(' ')
+browser_name = 'phantomjs'
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:37.0) Gecko/20100101 Firefox/37.0"
+service_log_path='/Users/ajmendez/tmp/ghostdriver.log'
+service_args=['--remote-debugger-port=9000']
+b = splinter.Browser(browser_name, user_agent=user_agent, service_log_path=service_log_path, service_args=service_args)
+# b = splinter.Browser('zope.testbrowser', ignore_robots=True, user_agent=user_agent)
+b.visit('https://manything.com/sign-in.html')
+b.find_by_id('username').first.fill(USERNAME)
+b.find_by_id('password').first.fill(PASSWORD)
+b.find_by_id('signin-btn').first.click()
+
+
+
+import os
+from selenium import webdriver
+USERNAME, PASSWORD = open(os.path.expanduser('~/.limited/numerousobject')).read().strip().split(' ')
+driver = webdriver.PhantomJS()
+driver.get("https://manything.com/sign-in.html")
+driver.find_element_by_id('username').send_keys(USERNAME)
+driver.find_element_by_id('password').send_keys(PASSWORD)
+driver.find_element_by_id('signin-btn').click()
+
+# driver.find_element_by_id('search_form_input_homepage').send_keys("realpython")
+# driver.find_element_by_id("search_button_homepage").click()
+driver.quit()
+
+
+
+
+
+import time
+
 from bs4 import BeautifulSoup
 from datetime import datetime
 USERNAME, PASSWORD = open(os.path.expanduser('~/.limited/numerousobject')).read().strip().split(' ')
@@ -23,7 +79,7 @@ OUTDIR = os.path.dirname(PATTERN.format(NOW))
 if not os.path.exists(OUTDIR):
     os.makedirs(OUTDIR)
 
-
+document.getElementById('noflash').setAttribute('visible', 'false')
 
 i = 0
 lasturl = None
@@ -62,41 +118,3 @@ with splinter.Browser(browser_name, user_agent=user_agent) as b:
         except Exception as e:
             print e
             raise
-        
-        
-    
-    
-
-# b.execute_script("console.log(document.getElementById('stillsImage'))")
-#
-#
-# '''
-# // var element = document.createElement("p").createTextNode(out);
-# // img.appendChild(element);
-#
-# http://stackoverflow.com/questions/26070834/how-to-fix-selenium-webdriverexception-the-browser-appears-to-have-exited-befor
-# '''
-#
-#
-# # b = splinter.Browser(browser_name, user_agent=user_agent)
-# i = 0
-# with splinter.Browser(browser_name, user_agent=user_agent) as b:
-#     b.visit('https://manything.com/sign-in.html')
-#     # b.screenshot('/mnt/video/manything/test.png')
-#     print 'logging into system...'
-#     b.find_by_id('username')[0].fill(USERNAME)
-#     b.find_by_id('password')[0].fill(PASSWORD)
-#     b.find_by_id('signin-btn')[0].click()
-#     assert u.url == u'https://manything.com/manything/', Exception('Could not get to right URL')
-#     time.sleep(DELAY)
-#     print 'Starting...'
-#     tmp = b.find_by_id('stillsImage')[0]
-#     print b.evaluate_script("document.getElementById('stillsImage').toDataURL()")
-#     # while True:
-#     #     time.sleep(DELAY)
-#     #     b.screenshot(PATTERN.format(datetime.now()))
-#     #     print i,
-#     #     i += 1
-#
-#
-# # b.execute_script("document.getElementById('stillsImage').toDataURL()")
