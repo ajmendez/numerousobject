@@ -72,7 +72,7 @@ class API(object):
     
     
 
-    def deviceinfo(self, device_id=0, **kwargs):
+    def deviceinfo(self, device_id=1, **kwargs):
         '''UID is a combination of the UID of the user and the device number starting at 1'''
         url = URL.format(subdomain=self.getsub(), request='deviceinfo')
         params = {
@@ -105,7 +105,7 @@ class API(object):
             'limit': 20, # default from web
         }
         params.update(kwargs)
-        return self._logger(device, 'livesession', **params)
+        return self._logger(device, 'session', **params)
     
     def sessionthumb(self, device, sessionid, **kwargs):
         '''Get a 192x144 jpg image for a sessionid'''
@@ -143,13 +143,13 @@ class API(object):
     
     def getstill(self, device, time, **kwargs):
         '''get a still image'''
-        url = '{logger}/getstill/{uid}/{time}/{token}'.format(time=time, **device)
+        url = '{logger}/getstill/{uidd}/{time}/{loggerToken}'.format(time=time, **device)
         return self._get(url, isjson=False)
     
     
     def liststills(self, device, session, starttime, endtime, **kwargs):
         params = {
-            'session': session
+            'session': session,
             'startt': starttime,
             'endt': endtime,
             'mingap': 1,
@@ -169,7 +169,7 @@ class API(object):
             'endt': endtime,
         }
         params.update(kwargs)
-        self._logger(device, 'video', **params)
+        return self._logger(device, 'video', **params)
     
     
     def alert(self, device, starttime=1, offset=0, limit=20, **kwargs):
@@ -182,6 +182,16 @@ class API(object):
         params.update(kwargs)
         return self._logger(device, 'alert', **params)
     
+    def editclip(self, device, **kwargs):
+        params = {
+            'id': clipid, 
+            'description': description,
+            'shared': 0,
+            'allowmanything': 0,
+        }
+        params.update(kwargs)
+        return self._logger(device, 'editclip', **params)
+        
     
     def timelapse(self, device, session, description, starttime, endtime, **kwargs):
         '''Create a timelapse'''
