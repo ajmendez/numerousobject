@@ -290,8 +290,8 @@ class API(object):
                                      endtime=endtime)
                 np.save(infofile, stills)
             endtime = np.min(stills)
-            if i in [0, 1]:
-                continue
+            # if i in [0, 1]:
+                # continue
             
             print 'Session {}:{} [{}] has {:,d} stills'.format(i, session['session'], 
                                                             datetime.fromtimestamp(session['session']),

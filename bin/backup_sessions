@@ -2,11 +2,13 @@
 
 import os
 import json
+os.path.append(os.path.expanduser('~/dev/numerousobject'))
 import numerousobject.api
 
 
 
-OUTDIR = '/Volumes/video/backup_manything/sessions'
+# OUTDIR = '/Volumes/video/backup_manything/sessions'
+OUTDIR = os.path.expanduser('~/downloads/backup_manything/sessions')
 
 
 def backup_sessions(outputdirectory):
@@ -29,7 +31,7 @@ def backup_sessions(outputdirectory):
         try:
             api.getsessionstills(device, sessions, outputdirectory)
         except IOError as e:
-            if 'token' in e.msg:
+            if 'token' in e.message:
                 print 'reset logger token...'
                 continue
             else:

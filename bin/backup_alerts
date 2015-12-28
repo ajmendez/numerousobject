@@ -2,11 +2,13 @@
 
 import os
 import json
+os.path.append(os.path.expanduser('~/dev/numerousobject'))
 import numerousobject.api
 
 
 
-OUTDIR = '/Volumes/video/backup_manything/alerts'
+# OUTDIR = '/Volumes/video/backup_manything/alerts'
+OUTDIR = os.path.expanduser('~/downloads/backup_manything/alerts')
 
 
 
