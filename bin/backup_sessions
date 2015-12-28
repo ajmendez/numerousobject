@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+
+import os
+import json
+import numerousobject.api
+
+
+
+OUTDIR = '/Volumes/video/backup_manything/sessions'
+
+
+def backup_sessions(outputdirectory):
+    username, password = numerousobject.api.credentials()
+    api = numerousobject.api.API(username, password)
+    api.login()
+    device = api.deviceinfo(1)
+    
+    # grab and save alerts
+    print 'Downloading sessions...'
+    sessions = api.session(device)
+    json.dump(sessions, open(os.path.join(outputdirectory, 'info.json'), 'w'), indent=2)
+    
+    # Download images
+    done = False
+    print 'Downloading images...'
+    while not done:
+        api.login()
+        device = api.deviceinfo(1)
+        try:
+            api.getsessionstills(device, sessions, outputdirectory)
+        except IOError as e:
+            if 'token' in e.msg:
+                print 'reset logger token...'
+                continue
+            else:
+                raise e
+    print 'Done!'
+    
+    
+
+
+
+if __name__ == '__main__':
+    backup_sessions(OUTDIR)

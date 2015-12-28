@@ -1,7 +1,10 @@
 import os
+import sys
+import time
 import requests
+import numpy as np
 from pprint import pprint
-
+from datetime import datetime, timedelta
 
 VERSION = '1.1'
 URL = 'https://{subdomain}.manything.com/{request}'
@@ -38,7 +41,12 @@ class API(object):
             if iscomplex:
                 return response.json()
             else:
-                return response.json()['result']
+                try:
+                    return response.json()['result']
+                except KeyError as e:
+                    print 'Could not get results: [{}]\n {}'.format(response, response.content)
+                    raise e
+                    
         else:
             return response.content
     
@@ -204,6 +212,112 @@ class API(object):
         params.update(kwargs)
         return self._logger(device, 'timelapse', **params)
     
+    
+    
+    
+    
+    def saveimage(self, filename, image):
+        '''Save an image to the disk'''
+        try:
+            with open(filename, 'w') as f:
+                f.write(image)
+        except Exception as e:
+            os.remove(filename)
+            raise
+    
+    def getallalerts(self, device):
+        '''Grab all of the alerts'''
+        done = False
+        out = []
+        offset = 0
+        while not done:
+            print len(out), 
+            try:
+                alerts = self.alert(device, offset=offset)
+                if len(alerts) == 0:
+                    done = True
+                out.extend(alerts)
+                offset += 20
+            except Exception as e:
+                print e
+                break
+        for alert in out:
+            alert['datestr'] = str(datetime.fromtimestamp(alert['alert']))
+        return out
+    
+    
+    def getalertstills(self, device, alerts, outputdirectory):
+        '''Download the alert stills'''
+        for i, alert in enumerate(alerts):
+            if i%((len(alerts)-1)/10) == 0:
+                print '{:0.0f}%'.format(i*100.0/len(alerts)),
+            outdir = os.path.join(outputdirectory, '{}'.format(alert['alert']))
+            if not os.path.exists(outdir):
+                os.makedirs(outdir)
+            
+        
+            stills = self.liststills(device, alert['alert'],
+                                     starttime=alert['startt']/1000,
+                                     endtime=alert['endt']/1000)
+            for still in stills:
+                filename = os.path.join(outdir, '{}.jpg'.format(still))
+                if os.path.exists(filename):
+    #                 print '.',
+                    continue
+                img = self.getstill(device, still)
+                self.saveimage(filename, img)
+    #         break
+    
+    
+    def getsessionstills(self, device, sessions, outputdirectory):
+        '''Try to download session Images'''
+        prevtime = time.mktime(datetime.now().timetuple()) - timedelta(days=7).total_seconds()
+        endtime = time.mktime(datetime.now().timetuple())
+        k = 0
+        for i,session in enumerate(sessions):
+            outdir = os.path.join(outputdirectory, '{}'.format(session['session']))
+            if not os.path.exists(outdir):
+                os.makedirs(outdir)
+    
+            infofile = os.path.join(outdir, '{}.npy'.format(session))
+            stills = None
+            if os.path.exists(infofile):
+                if os.stat(infofile).st_mtime > prevtime:
+                    stills = np.load(infofile)
+            if stills is None:
+                stills = self.liststills(device, session['session'], 
+                                     starttime=session['startt']/1000,
+                                     endtime=endtime)
+                np.save(infofile, stills)
+            endtime = np.min(stills)
+            if i in [0, 1]:
+                continue
+            
+            print 'Session {}:{} [{}] has {:,d} stills'.format(i, session['session'], 
+                                                            datetime.fromtimestamp(session['session']),
+                                                            len(stills))
+            
+            for j, still in enumerate(stills):
+                k+= 1
+                nicetime = int(np.floor(still/1000.0)*1000.0)
+                filename = os.path.join(outdir, 
+                                        '{0:d}_{1:%Y}.{1:%m}.{1:%d}_{1:%H}.{1:%M}'.format(nicetime, datetime.fromtimestamp(nicetime)),
+                                        '{}.jpg'.format(still))
+                basedir = os.path.dirname(filename)
+                if not os.path.exists(basedir):
+                    os.makedirs(basedir)
+                if os.path.exists(filename):
+                    continue
+                img = self.getstill(device, still)
+                if 'invalid token' in img:
+                    print img
+                    raise IOError('Token has expired. reinit device.')
+                self.saveimage(filename, img)
+                if (j%100) == 0:
+                    sys.stdout.write('{} '.format(j/100))
+                    sys.stdout.flush()
+        print 'Archived {:,d} images'.format(k)
+        
     
 
 if __name__ == '__main__':
