@@ -1,0 +1,25 @@
+#!/bin/bash
+
+
+directory="$1"
+
+OPTIONS='-framerate 18 -c:v libx264 -f image2pipe -vcodec mjpeg -pix_fmt yuv420p -i -  -r 24'
+OPTIONS='-framerate 18 -f image2pipe -vcodec mjpeg -pix_fmt yuv420p -i -  -r 24 -vcodec libx264 '
+
+pushd $directory > /dev/null
+
+for i in $(ls */*.jpg); do if [ -s "$i" ]; then cat $i; fi; done | ffmpeg $OPTIONS "../${directory%'/'}.mp4"
+
+popd > /dev/null
+
+# for directory in $(ls -d */);
+# do
+#     if [[ ! "$directory" =~ .*2015.* ]]; then continue; fi
+#
+#     #
+#     if [ ! -e "${directory}.mp4" ]; then
+#         pushd "$directory"
+#         for i in $(ls *.jpg); do if [ -s "$i" ]; then cat $i; fi; done | ffmpeg $OPTIONS "../${directory%'/'}.mp4"
+#         popd
+#     fi
+# done
