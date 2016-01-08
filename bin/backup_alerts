@@ -8,8 +8,9 @@ import numerousobject.api
 
 
 
-# OUTDIR = '/Volumes/video/backup_manything/alerts'
+# OUTDIR = '/home/ajmendez/downloads/backup_manything/alerts'
 OUTDIR = os.path.expanduser('~/downloads/backup_manything/alerts')
+OUTDIR = os.path.expanduser('~/data/alerts')
 
 
 

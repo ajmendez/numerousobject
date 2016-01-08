@@ -1,14 +1,31 @@
 #!/bin/bash
 
 
-directory="$1"
+# directory="$1"
+temp="$1"
+directory="$(realpath ${1:-/home/ajmendez/data/alerts})"
 
 OPTIONS='-framerate 18 -c:v libx264 -f image2pipe -vcodec mjpeg -pix_fmt yuv420p -i -  -r 24'
 OPTIONS='-framerate 18 -f image2pipe -vcodec mjpeg -pix_fmt yuv420p -i -  -r 24 -vcodec libx264 '
 
 pushd $directory > /dev/null
 
-for i in $(ls */*.jpg); do if [ -s "$i" ]; then cat $i; fi; done | ffmpeg $OPTIONS "../${directory%'/'}.mp4"
+
+
+
+# Remove Downstairs
+# FILENAME="../${directory%'/'}.mp4"
+# for i in $(ls */*.jpg); do if ( [ -s "$i" ] & [ "$(dirname $i)" -ge "1450630668" ] ) ; then cat $i; LAST=$i; fi; done | ffmpeg $OPTIONS "$FILENAME"
+# mv "$FILENAME" "${FILENAME%.mp4}.$(date '+%s').mp4"
+
+# TMP="$(realpath $directory)"
+LAST="$(date --date='1 day ago' '+%s')"
+FILENAME="$(dirname $directory)/$(basename $directory).$(date --date='1 day ago' '+%s.%Y.%m.%d.%H.%M.%S').mp4"
+# echo $FILENAME
+for i in $(ls */*.jpg); do if ( [ -s "$i" ] & [ "$(dirname $i)" -ge "$LAST" ] ) ; then cat $i; fi; done | ffmpeg $OPTIONS "$FILENAME"
+
+
+
 
 popd > /dev/null
 
