@@ -8,7 +8,11 @@ OPTIONS='-framerate 18 -f image2pipe -vcodec mjpeg -pix_fmt yuv420p -i -  -r 24 
 
 pushd $directory > /dev/null
 
-for i in $(ls */*.jpg); do if [ -s "$i" ]; then cat $i; fi; done | ffmpeg $OPTIONS "../${directory%'/'}.mp4"
+# for i in $(ls */*.jpg); do if [ -s "$i" ]; then cat $i; fi; done | ffmpeg $OPTIONS "../${directory%'/'}.mp4"
+
+# mac
+find . -type f -size +1c -name '*jpg' -exec cat {} \; | ffmpeg $OPTIONS "../${directory%'/'}.mp4"
+
 
 popd > /dev/null
 

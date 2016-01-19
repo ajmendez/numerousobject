@@ -44,7 +44,7 @@ class API(object):
                 try:
                     return response.json()['result']
                 except KeyError as e:
-                    print 'Could not get results: [{}]\n {}'.format(response, response.content)
+                    print('Could not get results: [{}]\n {}'.format(response, response.content))
                     raise e
                     
         else:
@@ -75,7 +75,7 @@ class API(object):
         self.logininfo = self._get(url, params=params)
         self.uid = self.logininfo['uid']
         self.token = self.logininfo['authToken']
-        print 'Logged in as {} [{}]'.format(self.username, self.uid)
+        print('Logged in as {} [{}]'.format(self.username, self.uid))
     
     
     
@@ -219,7 +219,7 @@ class API(object):
     def saveimage(self, filename, image):
         '''Save an image to the disk'''
         try:
-            with open(filename, 'w') as f:
+            with open(filename, 'wb') as f:
                 f.write(image)
         except Exception as e:
             os.remove(filename)
@@ -231,7 +231,7 @@ class API(object):
         out = []
         offset = 0
         while not done:
-            print len(out), 
+            print(len(out), end=' ')
             try:
                 alerts = self.alert(device, offset=offset)
                 if len(alerts) == 0:
@@ -239,7 +239,7 @@ class API(object):
                 out.extend(alerts)
                 offset += 20
             except Exception as e:
-                print e
+                print(e)
                 break
         for alert in out:
             alert['datestr'] = str(datetime.fromtimestamp(alert['alert']))
@@ -250,7 +250,7 @@ class API(object):
         '''Download the alert stills'''
         for i, alert in enumerate(alerts):
             if i%((len(alerts)-1)/10) == 0:
-                print '{:0.0f}%'.format(i*100.0/len(alerts)),
+                print('{:0.0f}%'.format(i*100.0/len(alerts)),end=' ')
             outdir = os.path.join(outputdirectory, '{}'.format(alert['alert']))
             if not os.path.exists(outdir):
                 os.makedirs(outdir)
@@ -293,9 +293,9 @@ class API(object):
             # if i in [0, 1]:
                 # continue
             
-            print 'Session {}:{} [{}] has {:,d} stills'.format(i, session['session'], 
+            print('Session {}:{} [{}] has {:,d} stills'.format(i, session['session'], 
                                                             datetime.fromtimestamp(session['session']),
-                                                            len(stills))
+                                                            len(stills)))
             
             for j, still in enumerate(stills):
                 k+= 1
@@ -310,13 +310,13 @@ class API(object):
                     continue
                 img = self.getstill(device, still)
                 if 'invalid token' in img:
-                    print img
+                    print(img)
                     raise IOError('Token has expired. reinit device.')
                 self.saveimage(filename, img)
                 if (j%100) == 0:
                     sys.stdout.write('{} '.format(j/100))
                     sys.stdout.flush()
-        print 'Archived {:,d} images'.format(k)
+        print('Archived {:,d} images'.format(k))
         
     
 
