@@ -3,6 +3,7 @@
 import os
 import sys
 import json
+
 from datetime import datetime
 sys.path.append(os.path.expanduser('~/dev/numerousobject'))
 sys.path.append('/usr/local/lib/python2.7/site-packages/')
@@ -12,6 +13,9 @@ import numerousobject.api
 
 # OUTDIR = '/Volumes/video/backup_manything/alerts'
 # OUTDIR = os.path.expanduser('~/downloads/backup_manything/alerts')
+# OUTDIR = '/home/ajmendez/downloads/backup_manything/alerts'
+# OUTDIR = os.path.expanduser('~/downloads/backup_manything/alerts')
+# OUTDIR = os.path.expanduser('~/data/alerts')
 OUTDIR = os.path.expanduser('~/Pictures/manything/alerts')
 
 
